@@ -15,6 +15,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from __future__ import absolute_import
+
 import copy
 import uuid
 
@@ -29,6 +31,7 @@ from keystone import exception
 from keystone import identity
 from keystone import tests
 from keystone.tests import default_fixtures
+from keystone.tests import fixtures
 from keystone.tests import test_backend
 
 
@@ -341,6 +344,12 @@ class LDAPIdentity(tests.TestCase, BaseLDAPIdentity):
 
         self.load_backends()
         self.load_fixtures(default_fixtures)
+
+        fixture = self.useFixture(fixtures.MoxFixture())
+        self.mox = fixture.mox
+
+        fixture = self.useFixture(fixtures.StuboutFixture())
+        self.stubs = fixture.stubs
 
     def test_configurable_allowed_project_actions(self):
         tenant = {'id': 'fake1', 'name': 'fake1', 'enabled': True}
