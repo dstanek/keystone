@@ -108,7 +108,7 @@ class JsonBodyMiddleware(wsgi.Middleware):
     """
     def process_request(self, request):
         # Abort early if we don't have any work to do
-        params_json = request.body
+        params_json = request.text
         if not params_json:
             return
 
