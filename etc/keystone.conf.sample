@@ -1413,3 +1413,14 @@
 #driver=keystone.trust.backends.sql.Trust
 
 
+[validation]
+
+#
+# Options defined in keystone
+#
+
+# Regular expression for validating resource IDs. The expression
+# should require IDs that are URL-friendly. (string value)
+#id_string_regex=^[a-z0-9-]+$
+
+

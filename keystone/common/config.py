@@ -763,6 +763,11 @@ FILE_OPTIONS = {
         cfg.IntOpt('default_lock_timeout', default=5,
                    help='Default lock timeout for distributed locking.'),
     ],
+    'validation': [
+        cfg.StrOpt('id_string_regex', default='^[a-z0-9-]+$',
+                   help='Regular expression for validating resource IDs. The '
+                   'expression should require IDs that are URL-friendly.')
+    ],
 }
 
 
