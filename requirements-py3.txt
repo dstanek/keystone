@@ -27,3 +27,4 @@ jsonschema>=2.0.0,<3.0.0
 # pycadf tries to pull in eventlet
 # pycadf>=0.5.1
 posix_ipc
+jsd
