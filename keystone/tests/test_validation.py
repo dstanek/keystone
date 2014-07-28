@@ -54,6 +54,11 @@ class BaseValidationTestCase(tests.TestCase):
         self.valid_email = 'joe@example.com'
         self.config_fixture.config(group='validation',
                                    id_string_regex='^[a-zA-Z0-9-]+$')
+
+class ValidationTestCase(BaseValidationTestCase):
+
+    def setUp(self):
+        super(ValidationTestCase, self).setUp()
         self.create_schema_validator = validators.SchemaValidator(_CREATE)
         self.update_schema_validator = validators.SchemaValidator(_UPDATE)
 
@@ -269,7 +274,7 @@ class ProjectValidationTestCase(BaseValidationTestCase):
     def test_validate_project_update_request(self):
         """Test that we validate a project update request."""
         request_to_validate = {'domain_id': uuid.uuid4().hex}
-        self.update_schema_validator.validate(request_to_validate)
+        self.update_project_validator.validate(request_to_validate)
 
     def test_validate_project_update_request_with_no_parameters_fails(self):
         """Exception is raised when updating project without parameters."""
@@ -349,7 +354,7 @@ class DomainValidationTestCase(BaseValidationTestCase):
     def test_validate_domain_update_request(self):
         """Test that we validate a domain update request."""
         request_to_validate = {'domain_id': uuid.uuid4().hex}
-        self.update_schema_validator.validate(request_to_validate)
+        self.update_domain_validator.validate(request_to_validate)
 
     def test_validate_domain_update_request_with_no_parameters_fails(self):
         """Exception is raised when updating a domain without parameters."""
