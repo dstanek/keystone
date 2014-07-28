@@ -13,6 +13,8 @@
 
 import functools
 
+import jsd
+
 from keystone.common.validation import validators
 
 
@@ -26,13 +28,37 @@ def validated(request_body_schema, resource_to_validate):
     :param resource_to_validate: the reference to validate
 
     """
-    schema_validator = validators.SchemaValidator(request_body_schema)
 
     def add_validator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
+            if callable(request_body_schema):
+                request_body_schema = request_body_schema().json()
+            schema_validator = validators.SchemaValidator(request_body_schema)
             if resource_to_validate in kwargs:
                 schema_validator.validate(kwargs[resource_to_validate])
             return func(*args, **kwargs)
         return wrapper
     return add_validator
+
+
+def validated_create(schema_class, resource_to_validate):
+    request_body_schema = restful_create_schema(schema_class)
+    return validated(request_body_schema, resource_to_validate)
+
+
+def validated_update(schema_class, resource_to_validate):
+    request_body_schema = restful_update_schema(schema_class)
+    return validated(request_body_schema, resource_to_validate)
+
+
+def restful_create_schema(schema_class):
+    return schema_class().json()
+
+
+def restful_update_schema(schema_class):
+    schema = schema_class().json()
+    if 'required' in schema:
+        del schema['required']
+    schema['minProperties'] = 1
+    return schema

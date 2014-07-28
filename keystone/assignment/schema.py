@@ -12,34 +12,18 @@
 
 from keystone.common.validation import parameter_types
 
+import jsd
 
-project_create = {
-    'type': 'object',
-    'properties': {
-        'description': parameter_types.description,
-        'domain_id': parameter_types.required_id_string,
-        'enabled': parameter_types.boolean,
-        'name': parameter_types.name
-    },
-    # NOTE(lbragstad): A project name is the only parameter required for
-    # project creation according to the Identity V3 API. We should think
-    # about using the maxProperties validator here, and in update.
-    'required': ['name', 'domain_id'],
-    'additionalProperties': True
-}
 
-project_update = {
-    'type': 'object',
-    'properties': {
-        'description': parameter_types.description,
-        'domain_id': parameter_types.required_id_string,
-        'enabled': parameter_types.boolean,
-        'name': parameter_types.name
-    },
-    # NOTE(lbragstad) Make sure at least one property is being updated
-    'minProperties': 1,
-    'additionalProperties': True
-}
+class ProjectSchema(jsd.Object):
+    # required
+    domain_id = parameter_types.IdString(required=True)
+    name = parameter_types.Name(required=True)
+
+    # optional
+    description = parameter_types.Description()
+    enabled = parameter_types.Boolean()
+
 
 domain_create = {
     'type': 'object',

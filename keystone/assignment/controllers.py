@@ -391,7 +391,7 @@ class ProjectV3(controller.V3Controller):
         self.get_member_from_driver = self.assignment_api.get_project
 
     @controller.protected()
-    @validation.validated(schema.project_create, 'project')
+    @validation.validated_create(schema.ProjectSchema, 'project')
     def create_project(self, context, project):
         ref = self._assign_unique_id(self._normalize_dict(project))
         ref = self._normalize_domain_id(context, ref)
@@ -417,7 +417,7 @@ class ProjectV3(controller.V3Controller):
         return ProjectV3.wrap_member(context, ref)
 
     @controller.protected()
-    @validation.validated(schema.project_update, 'project')
+    @validation.validated_update(schema.ProjectSchema, 'project')
     def update_project(self, context, project_id, project):
         self._require_matching_id(project_id, project)
         self._require_matching_domain_id(

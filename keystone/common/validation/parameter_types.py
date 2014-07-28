@@ -13,8 +13,14 @@
 
 from keystone import config
 
+import jsd
+
+
 CONF = config.CONF
 
+
+Object = jsd.Object
+Boolean = jsd.Boolean
 
 boolean = {
     'type': 'boolean',
@@ -33,23 +39,52 @@ name = {
     'maxLength': 255
 }
 
+def Name(required=False):
+    return jsd.String(min_len=1, max_len=255, required=required)
+
+
+class IdString(jsd.String):
+    type = 'string'
+    min_len = 1
+    max_len = 64
+    #pattern = CONF.validation.id_string_regex
+    pattern = '^[a-zA-Z0-9-]+$'
+
+
 required_id_string = {
     'type': 'string',
     'minLength': 1,
     'maxLength': 64,
-    'pattern': CONF.validation.id_string_regex
+    #'pattern': CONF.validation.id_string_regex
+    'pattern': '^[a-zA-Z0-9-]+$',
 }
 
 optional_id_string = {
     'type': ['string', 'null'],
     'minLength': 1,
     'maxLength': 64,
-    'pattern': CONF.validation.id_string_regex
+    #'pattern': CONF.validation.id_string_regex
+    'pattern': '^[a-zA-Z0-9-]+$',
 }
+
+Description = jsd.String
 
 description = {
     'type': ['string', 'null']
 }
+
+
+class Url(jsd.String):
+    type = 'string'
+    min_len = 0
+    max_len = 225
+    pattern = ('^https?://'
+               '(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)'
+               '+[a-zA-Z]{2,6}\.?|'
+               'localhost|'
+               '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+               '(?::\d+)?'
+               '(?:/?|[/?]\S+)$')
 
 url = {
     'type': 'string',
@@ -68,6 +103,8 @@ url = {
                '(?::\d+)?'
                '(?:/?|[/?]\S+)$'
 }
+
+Email = jsd.Email
 
 email = {
     'type': 'string',

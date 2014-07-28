@@ -14,6 +14,7 @@
 import uuid
 
 from keystone.assignment import schema as assignment_schema
+from keystone.common import validation
 from keystone.common.validation import parameter_types
 from keystone.common.validation import validators
 from keystone import exception
@@ -21,20 +22,17 @@ from keystone import tests
 
 
 # Test schema to validate create requests against
-_CREATE = {
-    'type': 'object',
-    'properties': {
-        'name': parameter_types.name,
-        'description': parameter_types.description,
-        'enabled': parameter_types.boolean,
-        'url': parameter_types.url,
-        'email': parameter_types.email,
-        'uuid': parameter_types.required_id_string,
-        'user_id': parameter_types.optional_id_string
-    },
-    'required': ['name'],
-    'additionalProperties': True,
-}
+
+
+class ExampleObject(parameter_types.Object):
+    name = parameter_types.Name(required=True)
+    description = parameter_types.Description()
+    enabled = parameter_types.Boolean()
+    url = parameter_types.Url()
+    email = parameter_types.Email()
+    uuid = parameter_types.IdString(nullable=False)
+    user_id = parameter_types.IdString()
+
 
 _UPDATE = {}
 
@@ -59,7 +57,8 @@ class ValidationTestCase(BaseValidationTestCase):
 
     def setUp(self):
         super(ValidationTestCase, self).setUp()
-        self.create_schema_validator = validators.SchemaValidator(_CREATE)
+        self.create_schema_validator = validators.SchemaValidator(
+            validation.restful_create_schema(ExampleObject))
         self.update_schema_validator = validators.SchemaValidator(_UPDATE)
 
     def test_create_schema_with_all_valid_parameters(self):
@@ -223,12 +222,10 @@ class ProjectValidationTestCase(BaseValidationTestCase):
 
         self.project_name = 'My Project'
 
-        create = assignment_schema.project_create
-        update = assignment_schema.project_update
-        delete = assignment_schema.project_delete
-        self.create_project_validator = validators.SchemaValidator(create)
-        self.update_project_validator = validators.SchemaValidator(update)
-        self.delete_project_validator = validators.SchemaValidator(delete)
+        self.create_project_validator = validators.SchemaValidator(
+            validation.restful_create_schema(assignment_schema.ProjectSchema))
+        self.update_project_validator = validators.SchemaValidator(
+            validation.restful_update_schema(assignment_schema.ProjectSchema))
 
     def test_validate_project_request(self):
         """Test that we validate a project with `name` in request."""
@@ -287,18 +284,6 @@ class ProjectValidationTestCase(BaseValidationTestCase):
         request_to_validate = {}
         self.assertRaises(exception.SchemaValidationError,
                           self.update_project_validator.validate,
-                          request_to_validate)
-
-    def test_validate_project_delete_request_takes_no_parameters(self):
-        """Test the delete validation schema."""
-        request_to_validate = {}
-        self.delete_project_validator.validate(request_to_validate)
-
-    def test_validate_project_delete_with_parameters_fails(self):
-        """Exception is raised on validate delete request with parameters."""
-        request_to_validate = {'enabled': True}
-        self.assertRaises(exception.SchemaValidationError,
-                          self.delete_project_validator.validate,
                           request_to_validate)
 
 
