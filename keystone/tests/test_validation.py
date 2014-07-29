@@ -206,6 +206,7 @@ class BaseValidationTestCase(tests.TestCase):
                                'uuid': None}
         self.assertRaises(exception.SchemaValidationError,
                           self.create_schema_validator.validate,
+                          request_to_validate)
 
 
 class ProjectValidationTestCase(BaseValidationTestCase):
