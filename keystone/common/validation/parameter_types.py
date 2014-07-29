@@ -47,8 +47,13 @@ class IdString(jsd.String):
     type = 'string'
     min_len = 1
     max_len = 64
-    #pattern = CONF.validation.id_string_regex
-    pattern = '^[a-zA-Z0-9-]+$'
+
+    @property
+    def pattern(self):
+        # NOTE(dstanek): this is a property so that it can be evaluated
+        # lazily. This can't be executed at import time because the
+        # config options wouldn't have been setup.
+        return CONF.validation.id_string_regex
 
 
 required_id_string = {
