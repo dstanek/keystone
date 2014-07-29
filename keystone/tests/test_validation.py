@@ -138,6 +138,7 @@ class ValidationTestCase(BaseValidationTestCase):
 
         for valid_url in valid_urls:
             request_to_validate = {'name': self.resource_name,
+                                   'uuid': uuid.uuid4().hex,
                                    'url': valid_url}
             self.create_schema_validator.validate(request_to_validate)
 
@@ -231,7 +232,8 @@ class ProjectValidationTestCase(BaseValidationTestCase):
 
     def test_validate_project_request(self):
         """Test that we validate a project with `name` in request."""
-        request_to_validate = {'name': self.project_name}
+        request_to_validate = {'name': self.project_name,
+                               'domain_id': uuid.uuid4().hex}
         self.create_project_validator.validate(request_to_validate)
 
     def test_validate_project_request_without_name_fails(self):
@@ -245,6 +247,7 @@ class ProjectValidationTestCase(BaseValidationTestCase):
         """Validate `enabled` as boolean-like values for projects."""
         for valid_enabled in _VALID_ENABLED_FORMATS:
             request_to_validate = {'name': self.project_name,
+                                   'domain_id': uuid.uuid4().hex,
                                    'enabled': valid_enabled}
             self.create_project_validator.validate(request_to_validate)
 
@@ -252,6 +255,7 @@ class ProjectValidationTestCase(BaseValidationTestCase):
         """Exception is raised when `enabled` isn't a boolean-like value."""
         for invalid_enabled in _INVALID_ENABLED_FORMATS:
             request_to_validate = {'name': self.project_name,
+                                   'domain_id': uuid.uuid4().hex,
                                    'enabled': invalid_enabled}
             self.assertRaises(exception.SchemaValidationError,
                               self.create_project_validator.validate,
@@ -260,12 +264,14 @@ class ProjectValidationTestCase(BaseValidationTestCase):
     def test_validate_project_request_with_valid_description(self):
         """Test that we validate `description` in create project requests."""
         request_to_validate = {'name': self.project_name,
+                               'domain_id': uuid.uuid4().hex,
                                'description': 'My Project'}
         self.create_project_validator.validate(request_to_validate)
 
     def test_validate_project_request_with_invalid_description_fails(self):
         """Exception is raised when `description` as a non-string value."""
         request_to_validate = {'name': self.project_name,
+                               'domain_id': uuid.uuid4().hex,
                                'description': False}
         self.assertRaises(exception.SchemaValidationError,
                           self.create_project_validator.validate,
