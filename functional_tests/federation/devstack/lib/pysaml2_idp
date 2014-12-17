@@ -44,14 +44,15 @@ function install_pysaml2_idp {
 }
 
 function configure_pysaml2_idp {
+    cp $FILES/idp_conf.py.template $PYSAML2_IDP_DIR/idp_conf.py
     (cd $PYSAML2_IDP_DIR;
-     cp idp_conf.py.example idp_conf.py;
+#     cp idp_conf.py.example idp_conf.py;
      make_metadata.py idp_conf.py > idp.xml)
-    sed -e "
-        /^HOST = /s/localhost/$PYSAML2_IDP_HOST/
-        /^PORT = /s/8088/$PYSAML2_IDP_PORT/
-        s/..\/sp-wsgi\/sp.xml/sp-metadata.xml/
-    " -i $PYSAML2_IDP_DIR/idp_conf.py
+    #sed -e "
+    #    /^HOST = /s/localhost/$PYSAML2_IDP_HOST/
+    #    /^PORT = /s/8088/$PYSAML2_IDP_PORT/
+    #    s/..\/sp-wsgi\/sp.xml/sp-metadata.xml/
+    #" -i $PYSAML2_IDP_DIR/idp_conf.py
 }
 
 function start_pysaml2_idp {

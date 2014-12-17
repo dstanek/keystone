@@ -72,6 +72,7 @@ function configure_keystone_federation {
 }
 
 function init_keystone_federation {
+    python $FILES/key-federation-setup.py
     #local domain_id=$(get_or_create_domain "domainX" "Domain for federated users")
     #get_or_create_project "projectX" $domain_id
     #get_or_create_role "memberX"
