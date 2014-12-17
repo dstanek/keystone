@@ -46,6 +46,7 @@ class Form(object):
         return cls(action=action, data=data)
 
     def post(self):
+        LOG.debug('POSTing %r to %s', self.data, self.action)
         return requests.post(self.action, data=self.data)
 
 
@@ -59,25 +60,26 @@ class BasicTest(testtools.TestCase):
 
         # Go to Federation auth on Keystone - we'll be ll be redirected
         # to the IdP's login page
-        print 'GETting', AUTH_URL
-        resp = requests.get(AUTH_URL)
-        print 'Landed on', resp.url
-        print
+        LOG.debug('GETting %s', self.AUTH_URL)
+        resp = requests.get(self.AUTH_URL)
+        LOG.debug('Received %d on %s', resp.status_code, resp.url)
 
         # Parse the login form and pill it out so we can login
+        if str(resp.status_code)[0] == '5':
+            LOG.error('Unexpected contents: %r', resp.content)
         form = Form.from_response(resp)
-        form.data['login'] = USERNAME
-        form.data['password'] = PASSWORD
+        form.data['login'] = self.USERNAME
+        form.data['password'] = self.PASSWORD
         resp = form.post()
-        print 'Landed on', resp.url
-        print
+        LOG.debug('Received %d on %s', resp.status_code, resp.url)
 
         # Once you successfully login you get a crazy form that effectively
         # redirects you back to Keystone with signed SAML data.
+        if str(resp.status_code)[0] == '5':
+            LOG.error('Unexpected contents: %r', resp.content)
         form = Form.from_response(resp)
         resp = form.post()
-        print 'Landed on', resp.url
-        print
+        LOG.debug('Received %d on %s', resp.status_code, resp.url)
 
         # The POST back to Keystone fails because mappings are not correct
         print resp.status_code

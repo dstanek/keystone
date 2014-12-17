@@ -35,7 +35,7 @@ function post_test_hook {
 function run_tests {
     echo run tests
     # TODO(dstanek): add the actual test run step
-    # tox -e federation-tests
+     tox -e functional_federation
 }
 
 function stack {
