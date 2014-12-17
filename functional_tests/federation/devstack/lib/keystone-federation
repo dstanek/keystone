@@ -54,6 +54,8 @@ function install_keystone_federation {
 function configure_keystone_federation {
     local here=$(cd $(dirname "$0") && pwd)
     local keystone_apache_conf=$(apache_site_config_for keystone)
+
+    # insert our Apache federation snippet into the Apache config
     sudo sed -e "0,/<\/VirtualHost>/ {
         /<\/VirtualHost>/ {
             h
@@ -63,9 +65,16 @@ function configure_keystone_federation {
         }
     }" -i $keystone_apache_conf
 
+    # add the federation auth methods
+    sudo sed -e "
+        /^#methods/s/#\(.*\)$/\1,saml2/
+        /^methods/a saml2 = keystone.auth.plugins.mapped.Mapped
+    " -i $KEYSTONE_CONF
+
+    # copy our mod_shib config file into place
     sudo cp $FILES/shibboleth2.xml /etc/shibboleth/
 
-    # look for one of the generated keys
+    # generate keys for mod_shib if they don't exist
     if [[ ! -e "/etc/shibboleth/sp-key.pem" ]]; then
         sudo shib-keygen -y 10
     fi
