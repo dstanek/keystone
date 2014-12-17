@@ -50,6 +50,13 @@ class Form(object):
         return requests.post(self.action, data=self.data)
 
 
+def assert_successful(response):
+    LOG.debug('Received %d on %s', response.status_code, response.url)
+    if str(response.status_code)[0] in ('5', '4'):
+        LOG.error('Unexpected contents: %r', response.content)
+        raise AssertionError('Request filed with a %d' % response.status_code)
+
+
 class BasicTest(testtools.TestCase):
     USERNAME = 'haho0032'
     PASSWORD = 'qwerty'
@@ -62,26 +69,17 @@ class BasicTest(testtools.TestCase):
         # to the IdP's login page
         LOG.debug('GETting %s', self.AUTH_URL)
         resp = requests.get(self.AUTH_URL)
-        LOG.debug('Received %d on %s', resp.status_code, resp.url)
+        assert_successful(resp)
 
         # Parse the login form and pill it out so we can login
-        if str(resp.status_code)[0] == '5':
-            LOG.error('Unexpected contents: %r', resp.content)
         form = Form.from_response(resp)
         form.data['login'] = self.USERNAME
         form.data['password'] = self.PASSWORD
         resp = form.post()
-        LOG.debug('Received %d on %s', resp.status_code, resp.url)
+        assert_successful(resp)
 
         # Once you successfully login you get a crazy form that effectively
         # redirects you back to Keystone with signed SAML data.
-        if str(resp.status_code)[0] == '5':
-            LOG.error('Unexpected contents: %r', resp.content)
         form = Form.from_response(resp)
         resp = form.post()
-        LOG.debug('Received %d on %s', resp.status_code, resp.url)
-
-        # The POST back to Keystone fails because mappings are not correct
-        print resp.status_code
-        print resp.headers
-        print resp.content
+        assert_successful(resp)
