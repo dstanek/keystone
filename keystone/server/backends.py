@@ -87,7 +87,7 @@ def load_backends():
     token_provider_api = token.provider.Manager()
     dependency.set_provider('token_provider_api', token_provider_api)
 
-    trust_api = trust.Manager()
+    trust_api = trust.Manager(identity_api)
     dependency.set_provider('trust_api', trust_api)
 
     DRIVERS = dict(

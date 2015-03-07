@@ -21,7 +21,6 @@ from oslo_log import log
 import six
 from six.moves import zip
 
-from keystone.common import dependency
 from keystone.common import manager
 from keystone import exception
 from keystone.i18n import _
@@ -33,7 +32,6 @@ CONF = cfg.CONF
 LOG = log.getLogger(__name__)
 
 
-@dependency.requires('identity_api')
 class Manager(manager.Manager):
     """Default pivot point for the Trust backend.
 
@@ -46,8 +44,9 @@ class Manager(manager.Manager):
 
     _TRUST = "OS-TRUST:trust"
 
-    def __init__(self):
+    def __init__(self, identity_api):
         super(Manager, self).__init__(CONF.trust.driver)
+        self.identity_api = identity_api
 
     @staticmethod
     def _validate_redelegation(redelegated_trust, trust):
