@@ -23,7 +23,6 @@ from oslo_log import log
 import six
 
 from keystone.common import cache
-from keystone.common import dependency
 from keystone.common import driver_hints
 from keystone.common import manager
 from keystone.common import utils
@@ -107,7 +106,6 @@ def check_endpoint_url(url):
         raise exception.URLValidationError(url)
 
 
-@dependency.provider('catalog_api')
 class Manager(manager.Manager):
     """Default pivot point for the Catalog backend.
 
