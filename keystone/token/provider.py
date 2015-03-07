@@ -121,36 +121,26 @@ class Manager(manager.Manager):
 
     def __init__(self):
         super(Manager, self).__init__(CONF.token.provider)
-        self._register_callback_listeners()
-
-    def _register_callback_listeners(self):
-        # This is used by the @dependency.provider decorator to register the
-        # provider (token_provider_api) manager to listen for trust deletions.
-        callbacks = {
-            notifications.ACTIONS.deleted: [
-                ['OS-TRUST:trust', self._trust_deleted_event_callback],
-                ['user', self._delete_user_tokens_callback],
-                ['domain', self._delete_domain_tokens_callback],
-            ],
-            notifications.ACTIONS.disabled: [
-                ['user', self._delete_user_tokens_callback],
-                ['domain', self._delete_domain_tokens_callback],
-                ['project', self._delete_project_tokens_callback],
-            ],
-            notifications.ACTIONS.internal: [
-                [notifications.INVALIDATE_USER_TOKEN_PERSISTENCE,
-                    self._delete_user_tokens_callback],
-                [notifications.INVALIDATE_USER_PROJECT_TOKEN_PERSISTENCE,
-                    self._delete_user_project_tokens_callback],
-                [notifications.INVALIDATE_USER_OAUTH_CONSUMER_TOKENS,
-                    self._delete_user_oauth_consumer_tokens_callback],
-            ]
+        self.event_callbacks = {
+            notifications.ACTIONS.deleted: {
+                'OS-TRUST:trust': self._trust_deleted_event_callback,
+                'user': self._delete_user_tokens_callback,
+                'domain': self._delete_domain_tokens_callback,
+            },
+            notifications.ACTIONS.disabled: {
+                'user': self._delete_user_tokens_callback,
+                'domain': self._delete_domain_tokens_callback,
+                'project': self._delete_project_tokens_callback,
+            },
+            notifications.ACTIONS.internal: {
+                notifications.INVALIDATE_USER_TOKEN_PERSISTENCE:
+                    self._delete_user_tokens_callback,
+                notifications.INVALIDATE_USER_PROJECT_TOKEN_PERSISTENCE:
+                    self._delete_user_project_tokens_callback,
+                notifications.INVALIDATE_USER_OAUTH_CONSUMER_TOKENS:
+                    self._delete_user_oauth_consumer_tokens_callback,
+            }
         }
-
-        for event, cb_info in callbacks.items():
-            for resource_type, callback_fns in cb_info:
-                notifications.register_event_callback(event, resource_type,
-                                                      callback_fns)
 
     @property
     def _needs_persistence(self):
