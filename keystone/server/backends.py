@@ -12,7 +12,6 @@
 
 from keystone import assignment
 from keystone import auth
-from keystone import catalog
 from keystone.common import cache
 from keystone.contrib import endpoint_filter
 from keystone.contrib import federation
@@ -62,3 +61,4 @@ def load_backends():
     auth.controllers.load_auth_methods()
 
     return DRIVERS
+
