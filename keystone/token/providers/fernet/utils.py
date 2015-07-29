@@ -116,7 +116,7 @@ def _create_new_key(keystone_user_id, keystone_group_id):
     # Determine the file name of the new key
     key_file = os.path.join(CONF.fernet_tokens.key_repository, '0')
     try:
-        with open(key_file, 'w') as f:
+        with open(key_file, 'wb') as f:
             f.write(key)
     finally:
         # After writing the key, set the umask back to it's original value. Do

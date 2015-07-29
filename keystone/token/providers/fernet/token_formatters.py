@@ -70,8 +70,15 @@ class TokenFormatter(object):
         return urllib.parse.quote(self.crypto.encrypt(payload))
 
     def unpack(self, token):
-        """Unpack a token, and validate the payload."""
-        token = urllib.parse.unquote(six.binary_type(token))
+        """Unpack a token, and validate the payload.
+
+        :param bytes token: the token to unpack
+        :returns: the bytes representing the unpacked token
+        :rtype: bytes
+        :raises keystone.exception.Unauthorized: when the token is invalid
+        """
+        token = urllib.parse.unquote(token)
+        token = token.encode('ascii')
 
         try:
             return self.crypto.decrypt(token)
@@ -80,10 +87,10 @@ class TokenFormatter(object):
 
     @classmethod
     def creation_time(cls, fernet_token):
-        """Returns the creation time of a valid Fernet token."""
-        # tokens may be transmitted as Unicode, but they're just ASCII
-        # (pypi/cryptography will refuse to operate on Unicode input)
-        fernet_token = six.binary_type(fernet_token)
+        """Returns the creation time of a valid Fernet token.
+
+        :param bytes fernet_token: a fernet token
+        """
 
         # the base64 padding on fernet tokens is made URL-safe
         fernet_token = urllib.parse.unquote(fernet_token)
@@ -166,10 +173,10 @@ class TokenFormatter(object):
         return token
 
     def validate_token(self, token):
-        """Validates a Fernet token and returns the payload attributes."""
-        # Convert v2 unicode token to a string
-        if not isinstance(token, six.binary_type):
-            token = token.encode('ascii')
+        """Validates a Fernet token and returns the payload attributes.
+
+        :param bytes token: a fernet token
+        """
 
         serialized_payload = self.unpack(token)
         versioned_payload = msgpack.unpackb(serialized_payload)
