@@ -5039,6 +5039,33 @@ class CatalogTests(object):
             expected_endpoint['enabled'] = True
         self.assertDictEqual(expected_endpoint, res)
 
+    def test_update_endpoint_non_exist_region_id(self):
+        dummy_service_ref, endpoint_ref, dummy_disabled_endpoint_ref = (
+            self._create_endpoints())
+        self.assertRaises(exception.NotFound,
+                          self.catalog_api.update_endpoint,
+                          endpoint_ref['id'],
+                          {'region_id': uuid.uuid4().hex})
+
+    def test_create_endpoint_defaults_to_enabled(self):
+        service = {
+            'id': uuid.uuid4().hex,
+            'type': uuid.uuid4().hex,
+            'name': uuid.uuid4().hex,
+            'description': uuid.uuid4().hex,
+        }
+        self.catalog_api.create_service(service['id'], service.copy())
+
+        endpoint = {
+            'id': uuid.uuid4().hex,
+            'region_id': None,
+            'service_id': service['id'],
+            'interface': 'public',
+            'url': uuid.uuid4().hex,
+        }
+        endpoint = self.catalog_api.create_endpoint(endpoint['id'], endpoint)
+        self.assertThat(endpoint.get('enabled'), matchers.Is(True))
+
     def _create_endpoints(self):
         # Creates a service and 2 endpoints for the service in the same region.
         # The 'public' interface is enabled and the 'internal' interface is
