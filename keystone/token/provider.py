@@ -26,7 +26,6 @@ from oslo_utils import timeutils
 import six
 
 from keystone.common import cache
-from keystone.common import dependency
 from keystone.common import manager
 from keystone import exception
 from keystone.i18n import _, _LE
@@ -101,7 +100,6 @@ def audit_info(parent_audit_id):
 
 
 @notifications.listener
-@dependency.requires('assignment_api', 'revoke_api')
 class Manager(manager.Manager):
     """Default pivot point for the token provider backend.
 
@@ -119,8 +117,11 @@ class Manager(manager.Manager):
     INVALIDATE_USER_TOKEN_PERSISTENCE = 'invalidate_user_tokens'
     _persistence_manager = None
 
-    def __init__(self):
+    def __init__(self, assignment_api, revoke_api, persistence):
         super(Manager, self).__init__(CONF.token.provider)
+        self.assignment_api = assignment_api
+        self.revoke_api = revoke_api
+        self._persistence = persistence
         self.event_callbacks = {
             notifications.ACTIONS.deleted: {
                 'OS-TRUST:trust': self._trust_deleted_event_callback,
@@ -147,7 +148,7 @@ class Manager(manager.Manager):
         return self.driver.needs_persistence()
 
     @property
-    def _persistence(self):
+    def __persistence(self):
         # NOTE(morganfainberg): This should not be handled via __init__ to
         # avoid dependency injection oddities circular dependencies (where
         # the provider manager requires the token persistence manager, which

@@ -37,8 +37,6 @@ REVOCATION_MEMOIZE = cache.get_memoization_decorator(
     section='token', expiration_section='revoke')
 
 
-@dependency.requires('assignment_api', 'identity_api', 'resource_api',
-                     'token_provider_api', 'trust_api')
 class PersistenceManager(manager.Manager):
     """Default pivot point for the Token Persistence backend.
 
@@ -49,8 +47,14 @@ class PersistenceManager(manager.Manager):
 
     driver_namespace = 'keystone.token.persistence'
 
-    def __init__(self):
+    def __init__(self, assignment_api, identity_api, resource_api,
+                 token_provider_api, trust_api):
         super(PersistenceManager, self).__init__(CONF.token.driver)
+        self.assignment_api = assignment_api
+        self.identity_api = identity_api
+        self.resource_api = resource_api
+        self.token_provider_api = token_provider_api
+        self.trust_api = trust_api
 
     def _assert_valid(self, token_id, token_ref):
         """Raise TokenNotFound if the token is expired."""
@@ -198,16 +202,15 @@ class PersistenceManager(manager.Manager):
         self.token_provider_api.invalidate_individual_token_cache(token_id)
 
 
-@dependency.requires('token_provider_api')
 class Manager(object):
     """The token_api provider.
 
     This class is a proxy class to the token_provider_api's persistence
     manager.
     """
-    def __init__(self):
-        # NOTE(morganfainberg): __init__ is required for dependency processing.
+    def __init__(self, token_provider_api):
         super(Manager, self).__init__()
+        self.token_provider_api = token_provider_api
 
     def __getattr__(self, item):
         """Forward calls to the `token_provider_api` persistence manager."""

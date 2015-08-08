@@ -81,11 +81,15 @@ def load_backends():
     role_api = assignment.RoleManager()
     dependency.set_provider('role_api', role_api)
 
-    token_api = token.persistence.Manager()
-    dependency.set_provider('token_api', token_api)
-
-    token_provider_api = token.provider.Manager()
+    token_provider_api = token.provider.Manager(assignment_api, revoke_api, persistence):
     dependency.set_provider('token_provider_api', token_provider_api)
+
+    token_persistence_api = token.persistence.PersistenceManager(
+        assignment_api, identity_api, resource_api,
+        token_provider_api, trust_api)
+
+    token_api = token.persistence.Manager(token_provider_api)
+    dependency.set_provider('token_api', token_api)
 
     trust_api = trust.Manager(identity_api)
     dependency.set_provider('trust_api', trust_api)

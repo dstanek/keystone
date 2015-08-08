@@ -14,6 +14,7 @@
 
 import datetime
 
+import mock
 from oslo_config import cfg
 from oslo_utils import timeutils
 
@@ -738,10 +739,13 @@ class TestTokenProvider(tests.TestCase):
                           'bogus')
 
     def test_supported_token_providers(self):
+        assignment_api = mock.Mock()
+        revoke_api = mock.Mock()
+
         # test default config
 
         dependency.reset()
-        self.assertIsInstance(token.provider.Manager().driver,
+        self.assertIsInstance(token.provider.Manager(assignment_api, revoke_api).driver,
                               uuid.Provider)
 
         dependency.reset()
@@ -761,10 +765,14 @@ class TestTokenProvider(tests.TestCase):
         self.assertIsInstance(token.provider.Manager().driver, fernet.Provider)
 
     def test_unsupported_token_provider(self):
+        assignment_api = mock.Mock()
+        revoke_api = mock.Mock()
         self.config_fixture.config(group='token',
                                    provider='my.package.MyProvider')
         self.assertRaises(ImportError,
-                          token.provider.Manager)
+                          token.provider.Manager,
+                          assignment_api,
+                          revoke_api)
 
     def test_provider_token_expiration_validation(self):
         self.assertRaises(exception.TokenNotFound,
