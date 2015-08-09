@@ -636,8 +636,8 @@ class VersionTestCase(tests.TestCase):
     def setUp(self):
         super(VersionTestCase, self).setUp()
         self.load_backends()
-        self.public_app = self.loadapp('keystone', 'main')
-        self.admin_app = self.loadapp('keystone', 'admin')
+        self.public_app = tests.loadapp('keystone', 'main')
+        self.admin_app = tests.loadapp('keystone', 'admin')
 
         self.config_fixture.config(
             public_endpoint='http://localhost:%(public_port)d',
@@ -956,13 +956,8 @@ class VersionSingleAppTestCase(tests.TestCase):
                 link['href'] = port
 
     def _test_version(self, app_name):
-        def app_port():
-            if app_name == 'admin':
-                return CONF.eventlet_server.admin_port
-            else:
-                return CONF.eventlet_server.public_port
-        app = self.loadapp('keystone', app_name)
-        client = tests.TestClient(app)
+        app = tests.loadapp('keystone', app_name)
+        client = self.client(app)
         resp = client.get('/')
         self.assertEqual(300, resp.status_int)
         data = jsonutils.loads(resp.body)
@@ -987,8 +982,8 @@ class VersionInheritEnabledTestCase(tests.TestCase):
     def setUp(self):
         super(VersionInheritEnabledTestCase, self).setUp()
         self.load_backends()
-        self.public_app = self.loadapp('keystone', 'main')
-        self.admin_app = self.loadapp('keystone', 'admin')
+        self.public_app = tests.loadapp('keystone', 'main')
+        self.admin_app = tests.loadapp('keystone', 'admin')
 
         self.config_fixture.config(
             public_endpoint='http://localhost:%(public_port)d',
@@ -1026,7 +1021,7 @@ class VersionBehindSslTestCase(tests.TestCase):
     def setUp(self):
         super(VersionBehindSslTestCase, self).setUp()
         self.load_backends()
-        self.public_app = self.loadapp('keystone', 'main')
+        self.public_app = tests.loadapp('keystone', 'main')
 
     def config_overrides(self):
         super(VersionBehindSslTestCase, self).config_overrides()

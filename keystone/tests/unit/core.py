@@ -269,6 +269,20 @@ class BaseTestCase(oslotest.BaseTestCase):
         return cleanup
 
 
+def paste_config(config):
+    if not config.startswith('config:'):
+        test_path = os.path.join(TESTSDIR, config)
+        etc_path = os.path.join(ROOTDIR, 'etc', config)
+        for path in [test_path, etc_path]:
+            if os.path.exists('%s-paste.ini' % path):
+                return 'config:%s-paste.ini' % path
+    return config
+
+
+def loadapp(config, name='main'):
+    return service.loadapp(paste_config(config), name=name)
+
+
 class TestCase(BaseTestCase):
 
     def config_files(self):
@@ -496,18 +510,6 @@ class TestCase(BaseTestCase):
                 fixtures_to_cleanup.append(attrname)
 
             self.addCleanup(self.cleanup_instance(*fixtures_to_cleanup))
-
-    def _paste_config(self, config):
-        if not config.startswith('config:'):
-            test_path = os.path.join(TESTSDIR, config)
-            etc_path = os.path.join(ROOTDIR, 'etc', config)
-            for path in [test_path, etc_path]:
-                if os.path.exists('%s-paste.ini' % path):
-                    return 'config:%s-paste.ini' % path
-        return config
-
-    def loadapp(self, config, name='main'):
-        return service.loadapp(self._paste_config(config), name=name)
 
     def clear_auth_plugin_registry(self):
         auth.controllers.AUTH_METHODS.clear()

@@ -56,7 +56,7 @@ class ClientDrivenTestCase(tests.TestCase):
             self.tenant_bar['id'],
             self.role_admin['id'])
 
-        conf = self._paste_config('keystone')
+        conf = tests.paste_config('keystone')
         fixture = self.useFixture(appserver.AppServer(conf, appserver.MAIN))
         self.public_server = fixture.server
         fixture = self.useFixture(appserver.AppServer(conf, appserver.ADMIN))

@@ -51,6 +51,18 @@ class RestfulTestCase(tests.TestCase):
     # default content type to test
     content_type = 'json'
 
+    @classmethod
+    def setUpClass(cls):
+        super(RestfulTestCase, cls).setUpClass()
+#        cls.public_app = webtest.TestApp(
+#            tests.loadapp('keystone', name='main'))
+        cls.admin_app = webtest.TestApp(
+            tests.loadapp('keystone', name='admin'))
+
+    @classmethod
+    def tearDownClass(cls):
+        super(RestfulTestCase, cls).tearDownClass()
+
     def get_extensions(self):
         return None
 
@@ -64,12 +76,12 @@ class RestfulTestCase(tests.TestCase):
         self.load_backends()
         self.load_fixtures(default_fixtures)
 
-        self.public_app = webtest.TestApp(
-            self.loadapp(app_conf, name='main'))
-        self.addCleanup(delattr, self, 'public_app')
-        self.admin_app = webtest.TestApp(
-            self.loadapp(app_conf, name='admin'))
-        self.addCleanup(delattr, self, 'admin_app')
+        #self.public_app = webtest.TestApp(
+        #    tests.loadapp(app_conf, name='main'))
+        #self.addCleanup(delattr, self, 'public_app')
+        #self.admin_app = webtest.TestApp(
+        #    tests.loadapp(app_conf, name='admin'))
+        #self.addCleanup(delattr, self, 'admin_app')
 
     def request(self, app, path, body=None, headers=None, token=None,
                 expected_status=None, **kwargs):

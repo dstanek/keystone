@@ -32,7 +32,7 @@ class IPv6TestCase(tests.TestCase):
 
     def test_ipv6_ok(self):
         """Make sure both public and admin API work with ipv6."""
-        paste_conf = self._paste_config('keystone')
+        paste_conf = tests.paste_config('keystone')
 
         # Verify Admin
         with appserver.AppServer(paste_conf, appserver.ADMIN, host="::1"):

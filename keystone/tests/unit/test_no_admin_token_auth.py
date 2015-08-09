@@ -27,7 +27,7 @@ class TestNoAdminTokenAuth(tests.TestCase):
         self._generate_paste_config()
 
         self.admin_app = webtest.TestApp(
-            self.loadapp(tests.dirs.tmp('no_admin_token_auth'), name='admin'),
+            tests.loadapp(tests.dirs.tmp('no_admin_token_auth'), name='admin'),
             extra_environ=dict(REMOTE_ADDR='127.0.0.1'))
         self.addCleanup(setattr, self, 'admin_app', None)
 

@@ -67,7 +67,7 @@ class SSLTestCase(tests.TestCase):
 
     def test_1way_ssl_ok(self):
         """Make sure both public and admin API work with 1-way SSL."""
-        paste_conf = self._paste_config('keystone')
+        paste_conf = tests.paste_config('keystone')
         ssl_kwargs = dict(cert=CERT, key=KEY, ca=CA)
 
         # Verify Admin
@@ -91,7 +91,7 @@ class SSLTestCase(tests.TestCase):
 
         Requires client certificate.
         """
-        paste_conf = self._paste_config('keystone')
+        paste_conf = tests.paste_config('keystone')
         ssl_kwargs = dict(cert=CERT, key=KEY, ca=CA, cert_required=True)
 
         # Verify Admin
@@ -114,7 +114,7 @@ class SSLTestCase(tests.TestCase):
         """Make sure both public and admin API work with 1-way ipv6 & SSL."""
         self.skip_if_no_ipv6()
 
-        paste_conf = self._paste_config('keystone')
+        paste_conf = tests.paste_config('keystone')
         ssl_kwargs = dict(cert=CERT, key=KEY, ca=CA, host="::1")
 
         # Verify Admin
@@ -140,7 +140,7 @@ class SSLTestCase(tests.TestCase):
         """
         self.skip_if_no_ipv6()
 
-        paste_conf = self._paste_config('keystone')
+        paste_conf = tests.paste_config('keystone')
         ssl_kwargs = dict(cert=CERT, key=KEY, ca=CA,
                           cert_required=True, host="::1")
 
@@ -162,7 +162,7 @@ class SSLTestCase(tests.TestCase):
 
     def test_2way_ssl_fail(self):
         """Expect to fail when client does not present proper certificate."""
-        paste_conf = self._paste_config('keystone')
+        paste_conf = tests.paste_config('keystone')
         ssl_kwargs = dict(cert=CERT, key=KEY, ca=CA, cert_required=True)
 
         # Verify Admin
